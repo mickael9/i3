@@ -127,6 +127,10 @@ void render_con(Con *con, bool render_fullscreen) {
     /* find the height for the decorations */
     params.deco_height = render_deco_height();
 
+    /* minimum decoration height to allow icon to fit
+     * not actuuly required, icon would be cropped otherwise */
+    params.deco_height = (params.deco_height < 16) ? 16 : params.deco_height;
+
     /* precalculate the sizes to be able to correct rounding errors */
     params.sizes = precalculate_sizes(con, &params);
 

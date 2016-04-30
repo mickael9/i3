@@ -583,6 +583,10 @@ void x_draw_decoration(Con *con) {
     //DLOG("indent_level = %d, indent_mult = %d\n", indent_level, indent_mult);
     int indent_px = (indent_level * 5) * indent_mult;
 
+    if (win->icon) {
+        indent_px += 18;
+    }
+
     int mark_width = 0;
     if (config.show_marks && !TAILQ_EMPTY(&(con->marks_head))) {
         char *formatted_mark = sstrdup("");
@@ -623,6 +627,22 @@ void x_draw_decoration(Con *con) {
                    con->deco_rect.width - indent_px - mark_width - 2 * logical_px(2));
     if (con->title_format != NULL)
         I3STRING_FREE(title);
+
+    /* Draw the icon */
+    if (win->icon) {
+        uint16_t width = 16;
+        uint16_t height = 16;
+
+        int icon_offset_y = (con->deco_rect.height - height) / 2;
+
+        draw_util_image(
+                (unsigned char *)win->icon,
+                &(parent->frame_buffer),
+                con->deco_rect.x + indent_px - width,
+                con->deco_rect.y + icon_offset_y,
+                width,
+                height);
+    }
 
 after_title:
     x_draw_decoration_after_title(con, p);
