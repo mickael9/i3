@@ -1,5 +1,3 @@
-#undef I3__FILE__
-#define I3__FILE__ "randr.c"
 /*
  * vim:ts=4:sw=4:expandtab
  *
@@ -848,9 +846,11 @@ void randr_disable_output(Output *output) {
         }
 
         DLOG("destroying disappearing con %p\n", output->con);
-        tree_close_internal(output->con, DONT_KILL_WINDOW, true, false);
-        DLOG("Done. Should be fine now\n");
+        Con *con = output->con;
+        /* clear the pointer before calling tree_close_internal in which the memory is freed */
         output->con = NULL;
+        tree_close_internal(con, DONT_KILL_WINDOW, true, false);
+        DLOG("Done. Should be fine now\n");
     }
 
     output->to_be_disabled = false;

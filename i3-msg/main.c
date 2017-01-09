@@ -14,6 +14,8 @@
  * Additionally, it’s even useful sometimes :-).
  *
  */
+#include "libi3.h"
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <sys/types.h>
@@ -34,7 +36,6 @@
 #include <xcb/xcb.h>
 #include <xcb/xcb_aux.h>
 
-#include "libi3.h"
 #include <i3/ipc.h>
 
 static char *socket_path;
@@ -205,7 +206,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (!payload)
-        payload = "";
+        payload = sstrdup("");
 
     int sockfd = socket(AF_LOCAL, SOCK_STREAM, 0);
     if (sockfd == -1)
@@ -220,6 +221,7 @@ int main(int argc, char *argv[]) {
 
     if (ipc_send_message(sockfd, strlen(payload), message_type, (uint8_t *)payload) == -1)
         err(EXIT_FAILURE, "IPC: write()");
+    free(payload);
 
     if (quiet)
         return 0;
@@ -238,9 +240,10 @@ int main(int argc, char *argv[]) {
     /* For the reply of commands, have a look if that command was successful.
      * If not, nicely format the error message. */
     if (reply_type == I3_IPC_MESSAGE_TYPE_COMMAND) {
-        yajl_handle handle;
-        handle = yajl_alloc(&reply_callbacks, NULL, NULL);
+        yajl_handle handle = yajl_alloc(&reply_callbacks, NULL, NULL);
         yajl_status state = yajl_parse(handle, (const unsigned char *)reply, reply_length);
+        yajl_free(handle);
+
         switch (state) {
             case yajl_status_ok:
                 break;
