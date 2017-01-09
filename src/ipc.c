@@ -1,5 +1,3 @@
-#undef I3__FILE__
-#define I3__FILE__ "ipc.c"
 /*
  * vim:ts=4:sw=4:expandtab
  *
@@ -10,6 +8,7 @@
  *
  */
 #include "all.h"
+
 #include "yajl_utils.h"
 
 #include <stdint.h>
@@ -23,7 +22,8 @@
 
 char *current_socketpath = NULL;
 
-TAILQ_HEAD(ipc_client_head, ipc_client) all_clients = TAILQ_HEAD_INITIALIZER(all_clients);
+TAILQ_HEAD(ipc_client_head, ipc_client)
+all_clients = TAILQ_HEAD_INITIALIZER(all_clients);
 
 /*
  * Puts the given socket file descriptor into non-blocking mode or dies if

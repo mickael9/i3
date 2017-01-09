@@ -1,5 +1,3 @@
-#undef I3__FILE__
-#define I3__FILE__ "commands.c"
 /*
  * vim:ts=4:sw=4:expandtab
  *
@@ -9,6 +7,8 @@
  * commands.c: all command functions (see commands_parser.c)
  *
  */
+#include "all.h"
+
 #include <stdint.h>
 #include <float.h>
 #include <stdarg.h>
@@ -17,7 +17,6 @@
 #include <sanitizer/lsan_interface.h>
 #endif
 
-#include "all.h"
 #include "shmlog.h"
 
 // Macros to make the YAJL API a bit easier to use.
@@ -143,7 +142,9 @@ static Con *maybe_auto_back_and_forth_workspace(Con *workspace) {
  */
 typedef struct owindow {
     Con *con;
-    TAILQ_ENTRY(owindow) owindows;
+
+    TAILQ_ENTRY(owindow)
+    owindows;
 } owindow;
 
 typedef TAILQ_HEAD(owindows_head, owindow) owindows_head;
@@ -892,8 +893,10 @@ void cmd_workspace_number(I3_CMD, const char *which, const char *_no_auto_back_a
         cmd_output->needs_tree_render = true;
         return;
     }
-    if (!no_auto_back_and_forth && maybe_back_and_forth(cmd_output, workspace->name))
+    if (!no_auto_back_and_forth && maybe_back_and_forth(cmd_output, workspace->name)) {
+        ysuccess(true);
         return;
+    }
     workspace_show(workspace);
 
     cmd_output->needs_tree_render = true;
@@ -939,8 +942,10 @@ void cmd_workspace_name(I3_CMD, const char *name, const char *_no_auto_back_and_
     }
 
     DLOG("should switch to workspace %s\n", name);
-    if (!no_auto_back_and_forth && maybe_back_and_forth(cmd_output, name))
+    if (!no_auto_back_and_forth && maybe_back_and_forth(cmd_output, name)) {
+        ysuccess(true);
         return;
+    }
     workspace_show_by_name(name);
 
     cmd_output->needs_tree_render = true;

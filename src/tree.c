@@ -1,5 +1,3 @@
-#undef I3__FILE__
-#define I3__FILE__ "tree.c"
 /*
  * vim:ts=4:sw=4:expandtab
  *
@@ -330,6 +328,12 @@ bool tree_close_internal(Con *con, kill_window_t kill_window, bool dont_kill_par
         TAILQ_REMOVE(&(con->swallow_head), match, matches);
         match_free(match);
         free(match);
+    }
+    while (!TAILQ_EMPTY(&(con->marks_head))) {
+        mark_t *mark = TAILQ_FIRST(&(con->marks_head));
+        TAILQ_REMOVE(&(con->marks_head), mark, marks);
+        FREE(mark->name);
+        FREE(mark);
     }
     free(con);
 

@@ -25,7 +25,7 @@ sub parser_calls {
     my ($command) = @_;
 
     my $stdout;
-    run [ '../test.config_parser', $command ],
+    run [ 'test.config_parser', $command ],
         '>/dev/null',
         '2>', \$stdout;
     # TODO: use a timeout, so that we can error out if it doesn’t terminate
@@ -467,6 +467,8 @@ my $expected_all_tokens = "ERROR: CONFIG: Expected one of these tokens: <end>, '
         force_focus_wrapping
         force_xinerama
         force-xinerama
+        disable_randr15
+        disable-randr15
         workspace_auto_back_and_forth
         fake_outputs
         fake-outputs

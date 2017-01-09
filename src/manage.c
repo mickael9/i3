@@ -1,5 +1,3 @@
-#undef I3__FILE__
-#define I3__FILE__ "manage.c"
 /*
  * vim:ts=4:sw=4:expandtab
  *
@@ -10,6 +8,7 @@
  *
  */
 #include "all.h"
+
 #include "yajl_utils.h"
 
 #include <yajl/yajl_gen.h>
@@ -496,6 +495,12 @@ void manage_window(xcb_window_t window, xcb_get_window_attributes_cookie_t cooki
         geom->y = wm_size_hints.y;
         geom->width = wm_size_hints.width;
         geom->height = wm_size_hints.height;
+    }
+
+    if (wm_size_hints.flags & XCB_ICCCM_SIZE_HINT_P_MIN_SIZE) {
+        DLOG("Window specifies minimum size %d x %d\n", wm_size_hints.min_width, wm_size_hints.min_height);
+        nc->window->min_width = wm_size_hints.min_width;
+        nc->window->min_height = wm_size_hints.min_height;
     }
 
     /* Store the requested geometry. The width/height gets raised to at least

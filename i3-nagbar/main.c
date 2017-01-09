@@ -8,6 +8,8 @@
  * when the user has an error in their configuration file.
  *
  */
+#include "libi3.h"
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -30,7 +32,6 @@
 #include <xcb/randr.h>
 #include <xcb/xcb_cursor.h>
 
-#include "libi3.h"
 #include "i3-nagbar.h"
 
 /** This is the equivalent of XC_left_ptr. I’m not sure why xcb doesn’t have a
@@ -467,6 +468,7 @@ int main(int argc, char *argv[]) {
         color_border_bottom = draw_util_hex_to_color("#ab7100");
     }
 
+    init_dpi();
     font = load_font(pattern, true);
     set_font(&font);
 

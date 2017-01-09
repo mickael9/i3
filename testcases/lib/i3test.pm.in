@@ -836,7 +836,7 @@ sub launch_with_config {
     if ($config ne '-default') {
         say $fh $config;
     } else {
-        open(my $conf_fh, '<', './i3-test.config')
+        open(my $conf_fh, '<', '@abs_top_srcdir@/testcases/i3-test.config')
             or $tester->BAIL_OUT("could not open default config: $!");
         local $/;
         say $fh scalar <$conf_fh>;
@@ -861,6 +861,7 @@ sub launch_with_config {
         cv => $cv,
         dont_create_temp_dir => $args{dont_create_temp_dir},
         validate_config => $args{validate_config},
+        inject_randr15 => $args{inject_randr15},
     );
 
     # If we called i3 with -C, we wait for it to exit and then return as

@@ -1,5 +1,3 @@
-#undef I3__FILE__
-#define I3__FILE__ "config_directives.c"
 /*
  * vim:ts=4:sw=4:expandtab
  *
@@ -9,10 +7,10 @@
  * config_directives.c: all config storing functions (see config_parser.c)
  *
  */
+#include "all.h"
+
 #include <float.h>
 #include <stdarg.h>
-
-#include "all.h"
 
 /*******************************************************************************
  * Criteria functions.
@@ -252,6 +250,10 @@ CFGFUN(mouse_warping, const char *value) {
 
 CFGFUN(force_xinerama, const char *value) {
     config.force_xinerama = eval_boolstr(value);
+}
+
+CFGFUN(disable_randr15, const char *value) {
+    config.disable_randr15 = eval_boolstr(value);
 }
 
 CFGFUN(force_focus_wrapping, const char *value) {

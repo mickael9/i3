@@ -9,6 +9,8 @@
  */
 #pragma once
 
+#include <config.h>
+
 #include <xcb/xcb.h>
 #include <cairo/cairo-xcb.h>
 
@@ -65,5 +67,6 @@ struct i3_output {
     struct ws_head* workspaces;  /* The workspaces on this output */
     struct tc_head* trayclients; /* The tray clients on this output */
 
-    SLIST_ENTRY(i3_output) slist; /* Pointer for the SLIST-Macro */
+    SLIST_ENTRY(i3_output)
+    slist; /* Pointer for the SLIST-Macro */
 };

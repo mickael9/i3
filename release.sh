@@ -1,8 +1,8 @@
 #!/bin/zsh
 # This script is used to prepare a new release of i3.
 
-export RELEASE_VERSION="4.12"
-export PREVIOUS_VERSION="4.11"
+export RELEASE_VERSION="4.13"
+export PREVIOUS_VERSION="4.12"
 export RELEASE_BRANCH="next"
 
 if [ ! -e "../i3.github.io" ]
@@ -55,13 +55,17 @@ git checkout -b release-${RELEASE_VERSION}
 cp "${STARTDIR}/RELEASE-NOTES-${RELEASE_VERSION}" "RELEASE-NOTES-${RELEASE_VERSION}"
 git add RELEASE-NOTES-${RELEASE_VERSION}
 git rm RELEASE-NOTES-${PREVIOUS_VERSION}
-sed -i "s,<refmiscinfo class=\"version\">[^<]*</refmiscinfo>,<refmiscinfo class=\"version\">${RELEASE_VERSION}</refmiscinfo>,g" man/asciidoc.conf
+sed -i "s,RELEASE-NOTES-${PREVIOUS_VERSION},RELEASE-NOTES-${RELEASE_VERSION},g" Makefile.am
+sed -i "s/AC_INIT(\[i3\], \[${PREVIOUS_VERSION}\]/AC_INIT([i3], [${RELEASE_VERSION}]/" configure.ac
 echo "${RELEASE_VERSION} ($(date +%F))" > I3_VERSION
 git add I3_VERSION
 git commit -a -m "release i3 ${RELEASE_VERSION}"
 git tag "${RELEASE_VERSION}" -m "release i3 ${RELEASE_VERSION}" --sign --local-user=0x4AC8EE1D
 
-make dist
+autoreconf -fi
+mkdir build
+(cd build && ../configure && make dist-bzip2 -j8)
+cp build/i3-${RELEASE_VERSION}.tar.bz2 .
 
 echo "Differences in the release tarball file lists:"
 
@@ -157,7 +161,7 @@ git add downloads/RELEASE-NOTES-${RELEASE_VERSION}.txt
 sed -i "s,<h2>Documentation for i3 v[^<]*</h2>,<h2>Documentation for i3 v${RELEASE_VERSION}</h2>,g" docs/index.html
 sed -i "s,<span style=\"margin-left: 2em; color: #c0c0c0\">[^<]*</span>,<span style=\"margin-left: 2em; color: #c0c0c0\">${RELEASE_VERSION}</span>,g" index.html
 sed -i "s,The current stable version is .*$,The current stable version is ${RELEASE_VERSION}.,g" downloads/index.html
-sed -i "s,<tbody>,<tbody>\n  <tr>\n    <td>${RELEASE_VERSION}</td>\n    <td><a href=\"/downloads/i3-${RELEASE_VERSION}.tar.bz2\">i3-${RELEASE_VERSION}.tar.bz2</a></td>\n    <td>$(ls -lh ../i3/i3-${RELEASE_VERSION}.tar.bz2 | awk -F " " {'print $5'} | sed 's/K$/ KiB/g')</td>\n    <td><a href=\"/downloads/i3-${RELEASE_VERSION}.tar.bz2.asc\">signature</a></td>\n    <td>$(date +'%Y-%m-%d')</td>\n    <td><a href=\"/downloads/RELEASE-NOTES-${RELEASE_VERSION}.txt\">release notes</a></td>\n  </tr>\n,g" downloads/index.html
+sed -i "s,<tbody>,<tbody>\n  <tr>\n    <td>${RELEASE_VERSION}</td>\n    <td><a href=\"/downloads/i3-${RELEASE_VERSION}.tar.bz2\">i3-${RELEASE_VERSION}.tar.bz2</a></td>\n    <td>$(LC_ALL=en_US.UTF-8 ls -lh ../i3/i3-${RELEASE_VERSION}.tar.bz2 | awk -F " " {'print $5'} | sed 's/K$/ KiB/g' | sed 's/M$/ MiB/g')</td>\n    <td><a href=\"/downloads/i3-${RELEASE_VERSION}.tar.bz2.asc\">signature</a></td>\n    <td>$(date +'%Y-%m-%d')</td>\n    <td><a href=\"/downloads/RELEASE-NOTES-${RELEASE_VERSION}.txt\">release notes</a></td>\n  </tr>\n,g" downloads/index.html
 
 git commit -a -m "add ${RELEASE_VERSION} release"
 
@@ -228,7 +232,12 @@ echo ""
 echo "  cd ${TMPDIR}"
 echo "  sendmail -t < email.txt"
 echo ""
+echo "Update milestones on GitHub:"
+echo "  Set due date of ${RELEASE_VERSION} to $(date +'%Y-$m-%d') and close the milestone"
+echo "  Create milestone for the next version with unset due date"
+echo ""
 echo "Announce on:"
 echo "  twitter"
 echo "  google+"
 echo "  #i3 topic"
+echo "  reddit /r/i3wm"

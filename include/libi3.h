@@ -10,6 +10,8 @@
  */
 #pragma once
 
+#include <config.h>
+
 #include <stdbool.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -89,7 +91,7 @@ void errorlog(char *fmt, ...)
 #if !defined(DLOG)
 void debuglog(char *fmt, ...)
     __attribute__((format(printf, 1, 2)));
-#define DLOG(fmt, ...) debuglog("%s:%s:%d - " fmt, I3__FILE__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+#define DLOG(fmt, ...) debuglog("%s:%s:%d - " fmt, STRIPPED__FILE__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #endif
 
 /**
@@ -470,6 +472,12 @@ char *get_exe_path(const char *argv0);
  * guessing the correct value otherwise.
  */
 void init_dpi(void);
+
+/**
+ * This function returns the value of the DPI setting.
+ *
+ */
+long get_dpi_value(void);
 
 /**
  * Convert a logical amount of pixels (e.g. 2 pixels on a “standard” 96 DPI

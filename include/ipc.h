@@ -9,6 +9,8 @@
  */
 #pragma once
 
+#include <config.h>
+
 #include <ev.h>
 #include <stdbool.h>
 #include <yajl/yajl_gen.h>
@@ -16,7 +18,7 @@
 
 #include "data.h"
 #include "tree.h"
-#include "config.h"
+#include "configuration.h"
 
 #include "i3/ipc.h"
 
@@ -29,7 +31,8 @@ typedef struct ipc_client {
     int num_events;
     char **events;
 
-    TAILQ_ENTRY(ipc_client) clients;
+    TAILQ_ENTRY(ipc_client)
+    clients;
 } ipc_client;
 
 /*

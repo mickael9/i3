@@ -4,7 +4,7 @@
  * i3 - an improved dynamic tiling window manager
  * © 2009 Michael Stapelberg and contributors (see also: LICENSE)
  *
- * include/config.h: Contains all structs/variables for the configurable
+ * include/configuration.h: Contains all structs/variables for the configurable
  * part of i3 as well as functions handling the configuration file (calling
  * the parser (src/config_parse.c) with the correct path, switching key
  * bindings mode).
@@ -12,10 +12,11 @@
  */
 #pragma once
 
+#include "libi3.h"
+
 #include <stdbool.h>
 #include "queue.h"
 #include "i3.h"
-#include "libi3.h"
 
 typedef struct Config Config;
 typedef struct Barconfig Barconfig;
@@ -67,7 +68,8 @@ struct Variable {
     char *value;
     char *next_match;
 
-    SLIST_ENTRY(Variable) variables;
+    SLIST_ENTRY(Variable)
+    variables;
 };
 
 /**
@@ -81,7 +83,8 @@ struct Mode {
     bool pango_markup;
     struct bindings_head *bindings;
 
-    SLIST_ENTRY(Mode) modes;
+    SLIST_ENTRY(Mode)
+    modes;
 };
 
 /**
@@ -152,6 +155,9 @@ struct Config {
      * reconfiguration is not possible). On startup, the list of screens
      * is fetched once and never updated. */
     bool force_xinerama;
+
+    /** Don’t use RandR 1.5 for querying outputs. */
+    bool disable_randr15;
 
     /** Overwrites output detection (for testing), see src/fake_outputs.c */
     char *fake_outputs;
@@ -252,7 +258,8 @@ struct Barconfig {
     /* List of outputs on which the tray is allowed to be shown, in order.
      * The special value "none" disables it (per default, it will be shown) and
      * the special value "primary" enabled it on the primary output. */
-    TAILQ_HEAD(tray_outputs_head, tray_output_t) tray_outputs;
+    TAILQ_HEAD(tray_outputs_head, tray_output_t)
+    tray_outputs;
 
     /* Padding around the tray icons. */
     int tray_padding;
@@ -283,7 +290,8 @@ struct Barconfig {
         M_MOD5 = 7
     } modifier;
 
-    TAILQ_HEAD(bar_bindings_head, Barbinding) bar_bindings;
+    TAILQ_HEAD(bar_bindings_head, Barbinding)
+    bar_bindings;
 
     /** Bar position (bottom by default). */
     enum { P_BOTTOM = 0,
@@ -350,7 +358,8 @@ struct Barconfig {
         char *binding_mode_text;
     } colors;
 
-    TAILQ_ENTRY(Barconfig) configs;
+    TAILQ_ENTRY(Barconfig)
+    configs;
 };
 
 /**
@@ -365,13 +374,15 @@ struct Barbinding {
     /** The command which is to be executed for this button. */
     char *command;
 
-    TAILQ_ENTRY(Barbinding) bindings;
+    TAILQ_ENTRY(Barbinding)
+    bindings;
 };
 
 struct tray_output_t {
     char *output;
 
-    TAILQ_ENTRY(tray_output_t) tray_outputs;
+    TAILQ_ENTRY(tray_output_t)
+    tray_outputs;
 };
 
 /**

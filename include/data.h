@@ -9,6 +9,8 @@
  */
 #pragma once
 
+#include "libi3.h"
+
 #define SN_API_NOT_YET_FROZEN 1
 #include <libsn/sn-launcher.h>
 
@@ -17,7 +19,6 @@
 #include <pcre.h>
 #include <sys/time.h>
 
-#include "libi3.h"
 #include "queue.h"
 
 /*
@@ -198,7 +199,8 @@ struct Workspace_Assignment {
     char *name;
     char *output;
 
-    TAILQ_ENTRY(Workspace_Assignment) ws_assignments;
+    TAILQ_ENTRY(Workspace_Assignment)
+    ws_assignments;
 };
 
 struct Ignore_Event {
@@ -206,7 +208,8 @@ struct Ignore_Event {
     int response_type;
     time_t added;
 
-    SLIST_ENTRY(Ignore_Event) ignore_events;
+    SLIST_ENTRY(Ignore_Event)
+    ignore_events;
 };
 
 /**
@@ -225,7 +228,8 @@ struct Startup_Sequence {
      * completed) */
     time_t delete_at;
 
-    TAILQ_ENTRY(Startup_Sequence) sequences;
+    TAILQ_ENTRY(Startup_Sequence)
+    sequences;
 };
 
 /**
@@ -251,7 +255,9 @@ struct regex {
 struct Binding_Keycode {
     xcb_keycode_t keycode;
     i3_event_state_mask_t modifiers;
-    TAILQ_ENTRY(Binding_Keycode) keycodes;
+
+    TAILQ_ENTRY(Binding_Keycode)
+    keycodes;
 };
 
 /******************************************************************************
@@ -308,12 +314,14 @@ struct Binding {
     /** Only in use if symbol != NULL. Contains keycodes which generate the
      * specified symbol. Useful for unbinding and checking which binding was
      * used when a key press event comes in. */
-    TAILQ_HEAD(keycodes_head, Binding_Keycode) keycodes_head;
+    TAILQ_HEAD(keycodes_head, Binding_Keycode)
+    keycodes_head;
 
     /** Command, like in command mode */
     char *command;
 
-    TAILQ_ENTRY(Binding) bindings;
+    TAILQ_ENTRY(Binding)
+    bindings;
 };
 
 /**
@@ -329,8 +337,12 @@ struct Autostart {
     /** no_startup_id flag for start_application(). Determines whether a
      * startup notification context/ID should be created. */
     bool no_startup_id;
-    TAILQ_ENTRY(Autostart) autostarts;
-    TAILQ_ENTRY(Autostart) autostarts_always;
+
+    TAILQ_ENTRY(Autostart)
+    autostarts;
+
+    TAILQ_ENTRY(Autostart)
+    autostarts_always;
 };
 
 /**
@@ -363,7 +375,8 @@ struct xoutput {
     /** x, y, width, height */
     Rect rect;
 
-    TAILQ_ENTRY(xoutput) outputs;
+    TAILQ_ENTRY(xoutput)
+    outputs;
 };
 
 /**
@@ -437,6 +450,10 @@ struct Window {
     int width_increment;
     int height_increment;
 
+    /* Minimum size specified for the window. */
+    int min_width;
+    int min_height;
+
     /* aspect ratio from WM_NORMAL_HINTS (MPlayer uses this for example) */
     double aspect_ratio;
 
@@ -497,7 +514,8 @@ struct Match {
            M_ASSIGN_WS,
            M_BELOW } insert_where;
 
-    TAILQ_ENTRY(Match) matches;
+    TAILQ_ENTRY(Match)
+    matches;
 
     /* Whether this match was generated when restarting i3 inplace.
      * Leads to not setting focus when managing a new window, because the old
@@ -541,7 +559,8 @@ struct Assignment {
         char *workspace;
     } dest;
 
-    TAILQ_ENTRY(Assignment) assignments;
+    TAILQ_ENTRY(Assignment)
+    assignments;
 };
 
 /** Fullscreen modes. Used by Con.fullscreen_mode. */
@@ -552,7 +571,8 @@ typedef enum { CF_NONE = 0,
 struct mark_t {
     char *name;
 
-    TAILQ_ENTRY(mark_t) marks;
+    TAILQ_ENTRY(mark_t)
+    marks;
 };
 
 /**
@@ -616,7 +636,8 @@ struct Con {
     char *sticky_group;
 
     /* user-definable marks to jump to this container later */
-    TAILQ_HEAD(marks_head, mark_t) marks_head;
+    TAILQ_HEAD(marks_head, mark_t)
+    marks_head;
     /* cached to decide whether a redraw is needed */
     bool mark_changed;
 
@@ -635,12 +656,17 @@ struct Con {
     struct deco_render_params *deco_render_params;
 
     /* Only workspace-containers can have floating clients */
-    TAILQ_HEAD(floating_head, Con) floating_head;
+    TAILQ_HEAD(floating_head, Con)
+    floating_head;
 
-    TAILQ_HEAD(nodes_head, Con) nodes_head;
-    TAILQ_HEAD(focus_head, Con) focus_head;
+    TAILQ_HEAD(nodes_head, Con)
+    nodes_head;
 
-    TAILQ_HEAD(swallow_head, Match) swallow_head;
+    TAILQ_HEAD(focus_head, Con)
+    focus_head;
+
+    TAILQ_HEAD(swallow_head, Match)
+    swallow_head;
 
     fullscreen_mode_t fullscreen_mode;
 
@@ -678,10 +704,17 @@ struct Con {
         FLOATING_USER_ON = 3
     } floating;
 
-    TAILQ_ENTRY(Con) nodes;
-    TAILQ_ENTRY(Con) focused;
-    TAILQ_ENTRY(Con) all_cons;
-    TAILQ_ENTRY(Con) floating_windows;
+    TAILQ_ENTRY(Con)
+    nodes;
+
+    TAILQ_ENTRY(Con)
+    focused;
+
+    TAILQ_ENTRY(Con)
+    all_cons;
+
+    TAILQ_ENTRY(Con)
+    floating_windows;
 
     /** callbacks */
     void (*on_remove_child)(Con *);
