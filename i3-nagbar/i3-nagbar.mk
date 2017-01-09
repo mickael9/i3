@@ -4,15 +4,15 @@ CLEAN_TARGETS += clean-i3-nagbar
 
 i3_nagbar_SOURCES := $(wildcard i3-nagbar/*.c)
 i3_nagbar_HEADERS := $(wildcard i3-nagbar/*.h)
-i3_nagbar_CFLAGS   = $(XCB_CFLAGS) $(XCB_CURSOR_CFLAGS) $(XCB_WM_CFLAGS) $(PANGO_CFLAGS)
-i3_nagbar_LIBS     = $(XCB_LIBS) $(XCB_CURSOR_LIBS) $(XCB_WM_LIBS) $(PANGO_LIBS)
+i3_nagbar_CFLAGS   = $(XCB_CFLAGS) $(XCB_CURSOR_CFLAGS) $(XCB_WM_CFLAGS) $(PANGO_CFLAGS) $(XCB_XRM_CFLAGS)
+i3_nagbar_LIBS     = $(XCB_LIBS) $(XCB_CURSOR_LIBS) $(XCB_WM_LIBS) $(PANGO_LIBS) $(XCB_XRM_LIBS)
 
 i3_nagbar_OBJECTS := $(i3_nagbar_SOURCES:.c=.o)
 
 
 i3-nagbar/%.o: i3-nagbar/%.c $(i3_nagbar_HEADERS)
 	echo "[i3-nagbar] CC $<"
-	$(CC) $(I3_CPPFLAGS) $(XCB_CPPFLAGS) $(CPPFLAGS) $(i3_nagbar_CFLAGS) $(I3_CFLAGS) $(CFLAGS) -c -o $@ $<
+	$(CC) $(I3_CPPFLAGS) $(CPPFLAGS) $(i3_nagbar_CFLAGS) $(I3_CFLAGS) $(CFLAGS) -c -o $@ $<
 
 i3-nagbar/i3-nagbar: libi3.a $(i3_nagbar_OBJECTS)
 	echo "[i3-nagbar] Link i3-nagbar"

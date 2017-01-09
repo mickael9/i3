@@ -4,15 +4,15 @@ CLEAN_TARGETS += clean-i3-input
 
 i3_input_SOURCES := $(wildcard i3-input/*.c)
 i3_input_HEADERS := $(wildcard i3-input/*.h)
-i3_input_CFLAGS   = $(XCB_CFLAGS) $(XCB_KBD_CFLAGS) $(PANGO_CFLAGS)
-i3_input_LIBS     = $(XCB_LIBS) $(XCB_KBD_LIBS) $(PANGO_LIBS)
+i3_input_CFLAGS   = $(XCB_CFLAGS) $(XCB_KBD_CFLAGS) $(PANGO_CFLAGS) $(XCB_XRM_CFLAGS)
+i3_input_LIBS     = $(XCB_LIBS) $(XCB_KBD_LIBS) $(PANGO_LIBS) $(XCB_XRM_LIBS)
 
 i3_input_OBJECTS := $(i3_input_SOURCES:.c=.o)
 
 
 i3-input/%.o: i3-input/%.c $(i3_input_HEADERS)
 	echo "[i3-input] CC $<"
-	$(CC) $(I3_CPPFLAGS) $(XCB_CPPFLAGS) $(CPPFLAGS) $(i3_input_CFLAGS) $(I3_CFLAGS) $(CFLAGS) -c -o $@ $<
+	$(CC) $(I3_CPPFLAGS) $(CPPFLAGS) $(i3_input_CFLAGS) $(I3_CFLAGS) $(CFLAGS) -c -o $@ $<
 
 i3-input/i3-input: libi3.a $(i3_input_OBJECTS)
 	echo "[i3-input] Link i3-input"
