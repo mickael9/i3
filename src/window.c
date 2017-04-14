@@ -400,7 +400,7 @@ void window_update_icon(i3Window *win, xcb_get_property_reply_t *prop)
             data  = prop_value;
         }
         if (len == 16*16) {
-            break; // found 16 pixels icon
+            break; /* found 16 pixels icon */
         }
 
         /* Find pointer to next icon in the reply. */
@@ -415,6 +415,7 @@ void window_update_icon(i3Window *win, xcb_get_property_reply_t *prop)
     }
 
     LOG("Got _NET_WM_ICON of size: (%d,%d)\n", data[0], data[1]);
+    win->name_x_changed = true; /* trigger a redraw */
 
     win->icon_width = data[0];
     win->icon_height = data[1];
