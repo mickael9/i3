@@ -160,7 +160,7 @@ void draw_util_image(unsigned char *src, int src_width, int src_height, surface_
 
     cairo_translate(surface->cr, x, y);
 
-    scale = MIN((double) width / src_width, (double) height / src_height);
+    scale = MIN((double)width / src_width, (double)height / src_height);
     cairo_scale(surface->cr, scale, scale);
 
     cairo_set_source_surface(surface->cr, image, 0, 0);

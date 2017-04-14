@@ -459,8 +459,8 @@ struct Window {
 
     /** Window icon, as array of ARGB pixels */
     uint32_t* icon;
-    uint32_t icon_width;
-    uint32_t icon_height;
+    int icon_width;
+    int icon_height;
 };
 
 /**

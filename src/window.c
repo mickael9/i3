@@ -397,10 +397,10 @@ void window_update_icon(i3Window *win, xcb_get_property_reply_t *prop)
 
         if (len == 0 || (crt_len >= 16*16 && crt_len < len)) {
             len = crt_len;
-            data  = prop_value;
+            data = prop_value;
         }
         if (len == 16*16) {
-            break; // found 16 pixels icon
+            break; /* found 16 pixels icon */
         }
 
         /* Find pointer to next icon in the reply. */
@@ -415,12 +415,26 @@ void window_update_icon(i3Window *win, xcb_get_property_reply_t *prop)
     }
 
     LOG("Got _NET_WM_ICON of size: (%d,%d)\n", data[0], data[1]);
+    win->name_x_changed = true; /* trigger a redraw */
 
     win->icon_width = data[0];
     win->icon_height = data[1];
+    win->icon = srealloc(win->icon, len * 4);
 
-    win->icon = malloc(len * 4);
-    memcpy(win->icon, &data[2], len * 4);
+    for (uint64_t i = 0; i < len; i++) {
+        uint8_t r, g, b, a;
+        a = (data[2 + i] >> 24) & 0xff;
+        r = (data[2 + i] >> 16) & 0xff;
+        g = (data[2 + i] >>  8) & 0xff;
+        b = (data[2 + i] >>  0) & 0xff;
+
+        /* Cairo uses premultiplied alpha */
+        r = (r * a) / 0xff;
+        g = (g * a) / 0xff;
+        b = (b * a) / 0xff;
+
+        win->icon[i] = (a << 24) | (r << 16) | (g << 8) | b;
+    }
 
     FREE(prop);
 }
