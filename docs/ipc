@@ -232,6 +232,8 @@ name (string)::
 	The name of this output (as seen in +xrandr(1)+). Encoded in UTF-8.
 active (boolean)::
 	Whether this output is currently active (has a valid mode).
+primary (boolean)::
+	Whether this output is currently the primary output.
 current_workspace (string)::
 	The name of the current workspace that is visible on this output. +null+ if
 	the output is not active.
@@ -671,6 +673,8 @@ barconfig_update (4)::
 binding (5)::
 	Sent when a configured command binding is triggered with the keyboard or
 	mouse
+shutdown (6)::
+	Sent when the ipc shuts down because of a restart or exit by user command
 
 *Example:*
 --------------------------------------------------------------------
@@ -694,9 +698,9 @@ if ($is_event) {
 
 This event consists of a single serialized map containing a property
 +change (string)+ which indicates the type of the change ("focus", "init",
-"empty", "urgent"). A +current (object)+ property will be present with the
-affected workspace whenever the type of event affects a workspace (otherwise,
-it will be +null).
+"empty", "urgent", "reload", "rename", "restored"). A +current (object)+
+property will be present with the affected workspace whenever the type of event
+affects a workspace (otherwise, it will be +null).
 
 When the change is "focus", an +old (object)+ property will be present with the
 previous workspace.  When the first switch occurs (when i3 focuses the
@@ -826,6 +830,20 @@ input_type (string)::
   "symbol": "t",
   "input_type": "keyboard"
  }
+}
+---------------------------
+
+=== shutdown event
+
+This event is triggered when the connection to the ipc is about to shutdown
+because of a user action such as a +restart+ or +exit+ command. The +change
+(string)+ field indicates why the ipc is shutting down. It can be either
++"restart"+ or +"exit"+.
+
+*Example:*
+---------------------------
+{
+ "change": "restart"
 }
 ---------------------------
 

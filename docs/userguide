@@ -479,7 +479,7 @@ mode <name>
 
 *Example*:
 ------------------------------------------------------------------------
-# Press $mod+o followed by either f, t, Esc or Return to launch firefox,
+# Press $mod+o followed by either f, t, Escape or Return to launch firefox,
 # thunderbird or return to the default mode, respectively.
 set $mode_launcher Launch: [f]irefox [t]hunderbird
 bindsym $mod+o mode "$mode_launcher"
@@ -488,7 +488,7 @@ mode "$mode_launcher" {
     bindsym f exec firefox
     bindsym t exec thunderbird
 
-    bindsym Esc mode "default"
+    bindsym Escape mode "default"
     bindsym Return mode "default"
 }
 ------------------------------------------------------------------------
@@ -946,12 +946,12 @@ the next section.
 
 === Focus follows mouse
 
-By default, window focus follows your mouse movements. However, if you have a
-setup where your mouse usually is in your way (like a touchpad on your laptop
-which you do not want to disable completely), you might want to disable 'focus
-follows mouse' and control focus only by using your keyboard.  The mouse will
-still be useful inside the currently active window (for example to click on
-links in your browser window).
+By default, window focus follows your mouse movements as the mouse crosses
+window borders. However, if you have a setup where your mouse usually is in your
+way (like a touchpad on your laptop which you do not want to disable
+completely), you might want to disable 'focus follows mouse' and control focus
+only by using your keyboard.  The mouse will still be useful inside the
+currently active window (for example to click on links in your browser window).
 
 *Syntax*:
 --------------------------
@@ -1127,9 +1127,9 @@ none::
 [[show_marks]]
 === Drawing marks on window decoration
 
-If activated, marks on windows are drawn in their window decoration. However,
-any mark starting with an underscore in its name (+_+) will not be drawn even if
-this option is activated.
+If activated, marks (see <<vim_like_marks>>) on windows are drawn in their window
+decoration. However, any mark starting with an underscore in its name (+_+) will
+not be drawn even if this option is activated.
 
 The default for this option is +yes+.
 
@@ -1378,7 +1378,7 @@ directive multiple times.
 
 *Syntax*:
 ---------------
-output <output>
+output primary|<output>
 ---------------
 
 *Example*:
@@ -1400,7 +1400,19 @@ bar {
         statusline #ffffff
     }
 }
+
+# show bar on the primary monitor and on HDMI2
+bar {
+    output primary
+    output HDMI2
+    status_command i3status
+}
+
 -------------------------------
+Note that you might not have a primary output configured yet. To do so, run:
+-------------------------
+xrandr --output <output> --primary
+-------------------------
 
 === Tray output
 
@@ -1802,7 +1814,8 @@ The +toggle+ option will toggle the orientation of the split container if it
 contains a single window. Otherwise it makes the current window a split
 container with opposite orientation compared to the parent container.
 Use +layout toggle split+ to change the layout of any split container from
-splitv to splith or vice-versa.
+splitv to splith or vice-versa. You can also define a custom sequence of layouts
+to cycle through with +layout toggle+, see <<manipulating_layout>>.
 
 *Syntax*:
 --------------------------------
@@ -1822,6 +1835,11 @@ Use +layout toggle split+, +layout stacking+, +layout tabbed+, +layout splitv+
 or +layout splith+ to change the current container layout to splith/splitv,
 stacking, tabbed layout, splitv or splith, respectively.
 
+Specify up to four layouts after +layout toggle+ to cycle through them. Every
+time the command is executed, the layout specified after the currently active
+one will be applied. If the currently active layout is not in the list, the
+first layout in the list will be activated.
+
 To make the current window (!) fullscreen, use +fullscreen enable+ (or
 +fullscreen enable global+ for the global mode), to leave either fullscreen
 mode use +fullscreen disable+, and to toggle between these two states use
@@ -1834,6 +1852,7 @@ enable+ respectively +floating disable+ (or +floating toggle+):
 --------------------------------------------
 layout default|tabbed|stacking|splitv|splith
 layout toggle [split|all]
+layout toggle [split|tabbed|stacking|splitv|splith] [split|tabbed|stacking|splitv|splith]…
 --------------------------------------------
 
 *Examples*:
@@ -1847,6 +1866,15 @@ bindsym $mod+x layout toggle
 
 # Toggle between stacking/tabbed/splith/splitv:
 bindsym $mod+x layout toggle all
+
+# Toggle between stacking/tabbed/splith:
+bindsym $mod+x layout toggle stacking tabbed splith
+
+# Toggle between splitv/tabbed
+bindsym $mod+x layout toggle splitv tabbed
+
+# Toggle between last split layout/tabbed/stacking
+bindsym $mod+x layout toggle split tabbed stacking
 
 # Toggle fullscreen
 bindsym $mod+f fullscreen toggle
@@ -2089,6 +2117,23 @@ i3-msg 'rename workspace "1: www" to "10: www"'
 i3-msg 'rename workspace to "2: mail"'
 bindsym $mod+r exec i3-input -F 'rename workspace to "%s"' -P 'New name: '
 --------------------------------------------------------------------------
+
+If you want to rename workspaces on demand while keeping the navigation stable,
+you can use a setup like this:
+
+*Example*:
+-------------------------
+bindsym $mod+1 workspace number "1: www"
+bindsym $mod+2 workspace number "2: mail"
+...
+-------------------------
+
+If a workspace does not exist, the command +workspace number "1: mail"+ will
+create workspace "1: mail".
+
+If a workspace with number 1 does already exist, the command will switch to this
+workspace and ignore the text part. So even when the workspace has been renamed
+to "1: web", the above command will still switch to it.
 
 === Moving workspaces to a different screen
 

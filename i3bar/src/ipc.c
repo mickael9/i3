@@ -63,12 +63,18 @@ void got_subscribe_reply(char *reply) {
  *
  */
 void got_output_reply(char *reply) {
+    DLOG("Clearing old output configuration...\n");
+    i3_output *o_walk;
+    SLIST_FOREACH(o_walk, outputs, slist) {
+        destroy_window(o_walk);
+    }
+    FREE_SLIST(outputs, i3_output);
+
     DLOG("Parsing outputs JSON...\n");
     parse_outputs_json(reply);
     DLOG("Reconfiguring windows...\n");
     reconfig_windows(false);
 
-    i3_output *o_walk;
     SLIST_FOREACH(o_walk, outputs, slist) {
         kick_tray_clients(o_walk);
     }
@@ -177,6 +183,11 @@ void got_bar_config_update(char *event) {
     /* update fonts and colors */
     init_xcb_late(config.fontname);
     init_colors(&(config.colors));
+
+    /* restart status command process */
+    kill_child();
+    start_child(config.command);
+    FREE(config.command);
 
     draw_bars(false);
 }
