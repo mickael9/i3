@@ -397,7 +397,7 @@ void window_update_icon(i3Window *win, xcb_get_property_reply_t *prop)
 
         if (len == 0 || (crt_len >= 16*16 && crt_len < len)) {
             len = crt_len;
-            data  = prop_value;
+            data = prop_value;
         }
         if (len == 16*16) {
             break; /* found 16 pixels icon */
