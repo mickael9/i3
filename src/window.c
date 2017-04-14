@@ -419,9 +419,22 @@ void window_update_icon(i3Window *win, xcb_get_property_reply_t *prop)
 
     win->icon_width = data[0];
     win->icon_height = data[1];
+    win->icon = srealloc(win->icon, len * 4);
 
-    win->icon = malloc(len * 4);
-    memcpy(win->icon, &data[2], len * 4);
+    for (uint64_t i = 0; i < len; i++) {
+        uint8_t r, g, b, a;
+        a = (data[2 + i] >> 24) & 0xff;
+        r = (data[2 + i] >> 16) & 0xff;
+        g = (data[2 + i] >>  8) & 0xff;
+        b = (data[2 + i] >>  0) & 0xff;
+
+        /* Cairo uses premultiplied alpha */
+        r = (r * a) / 0xff;
+        g = (g * a) / 0xff;
+        b = (b * a) / 0xff;
+
+        win->icon[i] = (a << 24) | (r << 16) | (g << 8) | b;
+    }
 
     FREE(prop);
 }
