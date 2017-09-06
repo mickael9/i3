@@ -79,6 +79,10 @@ void got_output_reply(char *reply) {
         kick_tray_clients(o_walk);
     }
 
+    if (!config.disable_ws) {
+        i3_send_msg(I3_IPC_MESSAGE_TYPE_GET_WORKSPACES, NULL);
+    }
+
     draw_bars(false);
 }
 
@@ -109,7 +113,6 @@ void got_bar_config(char *reply) {
     init_colors(&(config.colors));
 
     start_child(config.command);
-    FREE(config.command);
 }
 
 /* Data structure to easily call the reply handlers later */
@@ -174,6 +177,7 @@ void got_bar_config_update(char *event) {
 
     /* update the configuration with the received settings */
     DLOG("Received bar config update \"%s\"\n", event);
+    char *old_command = sstrdup(config.command);
     bar_display_mode_t old_mode = config.hide_on_modifier;
     parse_config_json(event);
     if (old_mode != config.hide_on_modifier) {
@@ -185,9 +189,11 @@ void got_bar_config_update(char *event) {
     init_colors(&(config.colors));
 
     /* restart status command process */
-    kill_child();
-    start_child(config.command);
-    FREE(config.command);
+    if (strcmp(old_command, config.command) != 0) {
+        kill_child();
+        start_child(config.command);
+    }
+    free(old_command);
 
     draw_bars(false);
 }
