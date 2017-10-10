@@ -544,7 +544,7 @@ void x_draw_decoration(Con *con) {
     /* 5: draw two unconnected horizontal lines in border color */
     x_draw_title_border(con, p);
 
-    /* 6: draw the title */
+    /* 6: draw the icon and title */
     int text_offset_y = (con->deco_rect.height - config.font.height) / 2;
     int text_offset_x = 0;
 
@@ -573,8 +573,24 @@ void x_draw_decoration(Con *con) {
         goto after_title;
     }
 
-    if (win->icon)
-        text_offset_x = 18;
+    /* Draw the icon */
+    if (win->icon) {
+        uint16_t icon_size = con->deco_rect.height - 2 * logical_px(1);
+
+        int icon_offset_y = (con->deco_rect.height - icon_size) / 2;
+
+        text_offset_x += icon_size + logical_px(1);
+
+        draw_util_image(
+                (unsigned char *)win->icon,
+                win->icon_width,
+                win->icon_height,
+                &(parent->frame_buffer),
+                con->deco_rect.x + logical_px(1),
+                con->deco_rect.y + icon_offset_y,
+                icon_size,
+                icon_size);
+    }
 
     int mark_width = 0;
     if (config.show_marks && !TAILQ_EMPTY(&(con->marks_head))) {
@@ -621,24 +637,6 @@ void x_draw_decoration(Con *con) {
 
     if (con->title_format != NULL) {
         I3STRING_FREE(title);
-    }
-
-    /* Draw the icon */
-    if (win->icon) {
-        uint16_t width = 16;
-        uint16_t height = 16;
-
-        int icon_offset_y = (con->deco_rect.height - height) / 2;
-
-        draw_util_image(
-                (unsigned char *)win->icon,
-                win->icon_width,
-                win->icon_height,
-                &(parent->frame_buffer),
-                con->deco_rect.x + logical_px(2),
-                con->deco_rect.y + icon_offset_y,
-                width,
-                height);
     }
 
 after_title:
