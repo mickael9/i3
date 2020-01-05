@@ -615,8 +615,9 @@ void x_draw_decoration(Con *con) {
     /* 5: draw title border */
     x_draw_title_border(con, p);
 
-    /* 6: draw the title */
+    /* 6: draw the icon and title */
     int text_offset_y = (con->deco_rect.height - config.font.height) / 2;
+    int text_offset_x = 0;
 
     const int title_padding = logical_px(2);
     const int deco_width = (int)con->deco_rect.width;
@@ -674,6 +675,26 @@ void x_draw_decoration(Con *con) {
     } else {
         title = con->title_format == NULL ? win->name : con_parse_title_format(con);
     }
+
+    /* Draw the icon */
+    if (win->icon) {
+        uint16_t icon_size = con->deco_rect.height - 2 * logical_px(1);
+
+        int icon_offset_y = (con->deco_rect.height - icon_size) / 2;
+
+        text_offset_x += icon_size + logical_px(1);
+
+        draw_util_image(
+                (unsigned char *)win->icon,
+                win->icon_width,
+                win->icon_height,
+                &(parent->frame_buffer),
+                con->deco_rect.x + logical_px(1),
+                con->deco_rect.y + icon_offset_y,
+                icon_size,
+                icon_size);
+    }
+
     if (title == NULL) {
         goto copy_pixmaps;
     }
@@ -702,9 +723,9 @@ void x_draw_decoration(Con *con) {
 
     draw_util_text(title, &(parent->frame_buffer),
                    p->color->text, p->color->background,
-                   con->deco_rect.x + title_offset_x,
+                   con->deco_rect.x + title_offset_x + text_offset_x,
                    con->deco_rect.y + text_offset_y,
-                   deco_width - mark_width - 2 * title_padding);
+                   deco_width - text_offset_x - mark_width - 2 * title_padding);
 
     if (win == NULL || con->title_format != NULL) {
         I3STRING_FREE(title);

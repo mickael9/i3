@@ -494,6 +494,11 @@ struct Window {
     /* Time when the window became managed. Used to determine whether a window
      * should be swallowed after initial management. */
     time_t managed_since;
+
+    /** Window icon, as array of ARGB pixels */
+    uint32_t* icon;
+    int icon_width;
+    int icon_height;
 };
 
 /**
