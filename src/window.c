@@ -17,6 +17,7 @@ void window_free(i3Window *win) {
     FREE(win->class_class);
     FREE(win->class_instance);
     i3string_free(win->name);
+    FREE(win->icon);
     FREE(win->ran_assignments);
     FREE(win);
 }
@@ -475,4 +476,92 @@ void window_update_motif_hints(i3Window *win, xcb_get_property_reply_t *prop, bo
 #undef MWM_DECOR_ALL
 #undef MWM_DECOR_BORDER
 #undef MWM_DECOR_TITLE
+}
+
+void window_update_icon(i3Window *win, xcb_get_property_reply_t *prop) {
+    uint32_t *data = NULL;
+    uint32_t width, height;
+    uint64_t len = 0;
+    const int pref_size = render_deco_height() - logical_px(2);
+
+    if (!prop || prop->type != XCB_ATOM_CARDINAL || prop->format != 32) {
+        DLOG("_NET_WM_ICON is not set\n");
+        FREE(prop);
+        return;
+    }
+
+    uint32_t prop_value_len = xcb_get_property_value_length(prop);
+    uint32_t *prop_value = (uint32_t *) xcb_get_property_value(prop);
+
+    /* Find an icon matching the preferred size.
+     * If there is no such icon, take the smallest icon having at least
+     * the preferred size
+     */
+    while (prop_value_len > (sizeof(uint32_t) * 2) && prop_value &&
+            prop_value[0] && prop_value[1]) {
+        /* Check that the property is as long as it should be (in bytes),
+           handling integer overflow. "+2" to handle the width and height
+           fields. */
+        const uint64_t cur_len = prop_value[0] * (uint64_t) prop_value[1];
+        const uint64_t expected_len = (cur_len + 2) * 4;
+        const uint32_t cur_width = prop_value[0];
+        const uint32_t cur_height = prop_value[1];
+
+        if (expected_len > prop_value_len) {
+            break;
+        }
+
+        DLOG("Found _NET_WM_ICON of size: (%d,%d)\n", cur_width, cur_height);
+
+        if (len == 0 || (cur_width >= pref_size && cur_height >= pref_size &&
+                         (cur_width < width || cur_height < height ||
+                          width < pref_size || height < pref_size))) {
+            len = cur_len;
+            width = cur_width;
+            height = cur_height;
+            data = prop_value;
+        }
+
+        if (width == pref_size && height == pref_size) {
+            break;
+        }
+
+        /* Find pointer to next icon in the reply. */
+        prop_value_len -= expected_len;
+        prop_value = (uint32_t *) (((uint8_t *) prop_value) + expected_len);
+    }
+
+    if (!data) {
+        DLOG("Could not get _NET_WM_ICON\n");
+        FREE(prop);
+        return;
+    }
+
+    DLOG("Using icon of size (%d,%d) (preferred size: %d)\n",
+         width, height, pref_size
+    );
+
+    win->name_x_changed = true; /* trigger a redraw */
+
+    win->icon_width = width;
+    win->icon_height = height;
+    win->icon = srealloc(win->icon, len * 4);
+
+
+    for (uint64_t i = 0; i < len; i++) {
+        uint8_t r, g, b, a;
+        a = (data[2 + i] >> 24) & 0xff;
+        r = (data[2 + i] >> 16) & 0xff;
+        g = (data[2 + i] >>  8) & 0xff;
+        b = (data[2 + i] >>  0) & 0xff;
+
+        /* Cairo uses premultiplied alpha */
+        r = (r * a) / 0xff;
+        g = (g * a) / 0xff;
+        b = (b * a) / 0xff;
+
+        win->icon[i] = (a << 24) | (r << 16) | (g << 8) | b;
+    }
+
+    FREE(prop);
 }
